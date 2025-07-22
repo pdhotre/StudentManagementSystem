@@ -1,43 +1,102 @@
 package com.studentapp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
-public class Main2 {
+import static java.lang.System.exit;
+
+public class Main3 {
     private static List<Student> studentList;
+    private static Scanner scanner;
 
     public static void main(String []args){
         System.out.println("***************** Student Management System *****************");
-        System.out.println("********************** Welcome **********************");
         studentList = new ArrayList<Student>();
+        scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("********************** Welcome **********************");
+            System.out.println("Select an Option....");
+            System.out.println("1. Register a Student");
+            System.out.println("2. Find Student with studentID");
+            System.out.println("3. List All Student Information");
+            System.out.println("4. List Student Information in Sorted Order");
+            System.out.println("5. Exit");
+            int option = scanner.nextInt();
 
-        Student s1 = new Student("Kajal Shinde", 26, "S-11");
+            switch (option) {
+                case 1:
+                    enrollStudent(scanner);
+                    break;
+                case 2:
+                    findByStudentId(scanner);
+                    break;
+                case 3:
+                    printAllStudentData();
+                    break;
+                case 4:
+                    sortByName();
+                    break;
+                case 5:
+                    exit();
+                    break;
+                default:
+                    System.out.println("Invalid option selected!!.... Enter between 1 to 5");
+            }
+        }
+    }
 
-        s1.enrollCourse("Java");
-        s1.enrollCourse("DevOps");
-        s1.enrollCourse("DSA");
-//        s1.enrollCourse("C#");
+    private static void enrollStudent(Scanner scanner) {
+        System.out.println("Enter Student Name: ");
+        String studentName = scanner.next();
+        System.out.println("Enter Student Age: ");
+        int studentAge = scanner.nextInt();
+        System.out.println("Enter Student Id: ");
+        String studentId = scanner.next();
 
-        Student s2 = new Student("Sanjay", 22, "S-12");
-        s2.enrollCourse("Java");
+        Student newStudent = new Student(studentName, studentAge, studentId);
+        studentList.add(newStudent);
+        while (true) {
+            System.out.println("Enter the course to be enrolled: .... Type Done to exit");
+            String courseName = scanner.next();
+            if(courseName.equalsIgnoreCase("Done")){
+                break;
+            }
+            newStudent.enrollCourse(courseName);
+        }
+        newStudent.printStudentInfo();
 
-        Student s4 = new Student("Tom", 25, "S-10");
-        s4.enrollCourse("DevOps");
+    }
 
-        Student s5 = new Student("Ajinkya", 23, "S-15");
-        s5.enrollCourse("DevOps");
+    private static void exit() {
+        System.out.println("Done");
+        System.exit(0);
+    }
 
-        studentList.add(s1);
-        studentList.add(s2);
-        studentList.add(s4);
-        studentList.add(s5);
+    private static void printAllStudentData() {
+        if(studentList.size()>0) {
+            System.out.println("------------------- PRINT ALL STUDENT DATA -------------------");
+            for (Student student : studentList) {
+                student.printStudentInfo();
+            }
+        }
+        else{
+            System.err.println("Student List is empty. No Student record found");
+        }
+    }
 
-        Student result = findByStudentId("S-11");
-        System.out.println("Result: "+result);
-
-        sortByName();
+    private static void findByStudentId(Scanner scanner) {
+        Student studentFound = null;
+        System.out.println("Enter the student id: ");
+        String studentId = scanner.next();
+        try {
+            studentFound = studentList
+                    .stream()
+                    .filter(x -> x.getStudentId().equalsIgnoreCase(studentId))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No Data Found!!!"));
+        } catch (RuntimeException e) {
+            System.err.println("Student with ID "+studentId+" not found!!");
+        }
+        studentFound.printStudentInfo();
     }
 
     private static void sortByName() {
@@ -51,10 +110,10 @@ public class Main2 {
         };
 
         Collections.sort(studentList, studentNameComparator);
-        System.out.println(studentList);
+        printAllStudentData();
     }
 
-    public static Student findByStudentId(String studentId){
+    public static Student findByStudent(String studentId){
         Student result = null;
         try {
             result = studentList
